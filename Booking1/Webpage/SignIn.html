@@ -1,0 +1,60 @@
+﻿<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
+<script>
+    $().ready(function () {
+        var mainContainer = $("#mainContainer");
+        $("[name=inputEmail]").val(ReadCookie("previousEmail"));
+
+        //https://stackoverflow.com/a/12518467
+        $("[name=inputEmail]").keypress(function (e) {
+            if (e.which == 13) {
+                OnCLickBtnSubmit($("#btnSubmit"), mainContainer);
+                return false;
+            }
+        });
+
+        dogValidate.rules = {
+            inputEmail: {
+                required: true,
+                minlength: 4,
+                email: true
+            }
+        };
+        mainContainer.validate(dogValidate);
+
+        mainContainer.on("click", "#btnSubmit", function (e) { OnCLickBtnSubmit($(e.currentTarget), mainContainer); });
+    });
+
+    function DisableForm(disable) {
+        $("[name=inputEmail]").prop("disabled", disable);
+        $("#btnSubmit").prop("disabled", disable);
+    }
+
+    function OnCLickBtnSubmit(current, thisContainer) {
+        if (!thisContainer.valid()) {
+            return;
+        }
+
+        var emailValue = $("[name=inputEmail]").val();
+        DisableForm(true);
+        CreateCookie("previousEmail", emailValue, 1000);
+        var ajaxUrl = '/api/SendLoginMail';
+        var ajaxParams = {
+            companyId: current.attr("companyid"),
+            companyName: $("#companyNameMessage").html(),
+            emailAddress: emailValue
+        };
+        $.ajax({
+            type: 'POST',
+            contentType: "application/json",
+            url: ajaxUrl,
+            data: JSON.stringify(ajaxParams)
+        })
+            .done(function (data) {
+                window.location.href = '/api/MarkupPage/CloseThisTab?m=' + current.attr("companyid");
+            })
+            .fail(function () {
+                DisableForm(false);
+                alert("appDeveloper: Sorry, the app made a mistake.");
+            });
+    }
+</script>

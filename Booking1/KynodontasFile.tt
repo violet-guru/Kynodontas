@@ -1,0 +1,30 @@
+﻿//T4 comment: https://stackoverflow.com/a/16962822/6227407
+<#@ assembly name="$(SolutionDir)Kynodontas.Basic\bin\Debug\Kynodontas.Basic.dll" #>
+<#@ import namespace="Kynodontas.Basic" #>
+<# var manager = new PageManager(); #>
+namespace FunctionApp1
+{
+	public class KynodontasFile {
+		public string GetPageText(string pageName, out bool isValid) {
+			isValid = true;
+
+		    switch (pageName)
+            {
+				<# this.Write(manager.GetPagesInAppFolder()); #>
+
+				default:
+					isValid = false;
+					return @"";
+            }
+		}
+
+		public string GetTranslationBinary(string browserLocale) {
+		    switch (browserLocale)
+            {
+                case "es":			return @"<# this.Write(manager.GetTranslationFileFromDisk("es")); #>";
+				case "zh-cn":		return @"<# this.Write(manager.GetTranslationFileFromDisk("zh-cn")); #>";
+				default:			return @"";
+            }
+		}
+	}
+}

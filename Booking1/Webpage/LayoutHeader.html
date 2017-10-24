@@ -1,0 +1,274 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title></title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css"
+          integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M"
+          crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+
+        table .alternRow > td {
+            background-color: #f3f3f3;
+        }
+
+        /*buttons by default*/
+        .btn-outline-info {
+            background-color: white;
+            cursor: pointer;
+        }
+
+        #pageLoader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0px;
+            left: 0px;
+            background-color: rgba(255, 255, 255, 0.5);
+            z-index: 999;
+            text-align: center;
+        }
+
+            /*http://jsfiddle.net/markgonz007/3zo91e1o/ */
+            #pageLoader:before {
+                content: ' ';
+                display: inline-block;
+                vertical-align: middle;
+                height: 100%;
+            }
+
+            #pageLoader > .line-scale-party {
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+                #pageLoader > .line-scale-party > div {
+                    background-color: gray;
+                }
+
+        table.dogTable {
+            width: 100%;
+            max-width: 100%;
+        }
+
+            table.dogTable td {
+                padding: 0.4rem;
+            }
+
+            table.dogTable .initialRow > td {
+                padding-bottom: 0;
+            }
+
+            table.dogTable .finalRow > td {
+                padding-top: 0;
+            }
+
+        table.agendaTable .presentTimeLineTop > td {
+            border-top-style: solid;
+            border-top-width: 0.3rem;
+            border-top-color: #17a2b8;
+        }
+
+        table.agendaTable .presentTimeLineBottom > td {
+            border-bottom-style: solid;
+            border-bottom-width: 0.3rem;
+            border-bottom-color: #17a2b8;
+        }
+
+        table#scheduleMarkup td {
+            text-align: center;
+            padding: 3px 8px 3px 8px;
+        }
+
+        table#scheduleMarkup th {
+            text-align: center;
+            padding: 3px 8px 3px 8px;
+        }
+
+        table#scheduleMarkup .btn {
+            width: 100%;
+        }
+
+        #listContainer .btn {
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        #indexActions .btnAction {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        #confirmationContainer .titleColumn {
+            font-weight: bold;
+        }
+
+        #confirmationContainer .valueColumn {
+            text-align: center;
+        }
+
+        @media (min-width: 992px) {
+            #confirmationContainer .titleColumn {
+                text-align: right;
+            }
+
+            #confirmationContainer .valueColumn {
+                text-align: left;
+            }
+        }
+    </style>
+    <script>
+        //Convert <Unix ticks> to display format
+        function ConvertToLocalTime() {
+            $("[shortTimeString]").each(function (index, element) {
+                var current = $(element);
+                var dateTime = new Date(current.attr("shortTimeString") * 1);
+                current.html(moment(dateTime).format('LT'));
+            });
+
+            $("[shortTimeVisual]").each(function (index, element) {
+                var current = $(element);
+                var dateTime = new Date(current.attr("shortTimeVisual") * 1);
+                current.html(moment(dateTime).format('h:mm'));
+            });
+
+            $("[shortDateString]").each(function (index, element) {
+                var current = $(element);
+                var dateTime = new Date(current.attr("shortDateString") * 1);
+                current.html(moment(dateTime).format('MMMM D'));
+            });
+
+            $("[dayOfWeekString]").each(function (index, element) {
+                var current = $(element);
+                var dateTime = new Date(current.attr("dayOfWeekString") * 1);
+                current.html(moment(dateTime).format('dddd'));
+            });
+        }
+
+        //https://www.quirksmode.org/js/cookies.html
+        function CreateCookie(name, value, days) {
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                var expires = "; expires=" + date.toGMTString();
+            }
+            else var expires = "";
+            document.cookie = name + "=" + value + expires + "; path=/";
+        }
+
+        function ReadCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        function EraseCookie(name) {
+            createCookie(name, "", -1);
+        }
+
+        //https://stackoverflow.com/a/2117523
+        function NewGuid() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        //https://stackoverflow.com/a/901144
+        function GetParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+        //https://jqueryvalidation.org/files/demo/bootstrap/index.html
+        var dogValidate = {
+            errorPlacement: function (error, element) {
+                // Add the class to the error element
+                error.addClass("font-italic");
+                error.addClass("invalid-feedback");
+
+                if (element.prop("type") === "checkbox") {
+                    error.insertAfter(element.parent("label"));
+                } else {
+                    error.insertAfter(element);
+                }
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass("is-invalid").removeClass("is-valid");
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).addClass("is-valid").removeClass("is-invalid");
+            }
+        }
+
+        //https://stackoverflow.com/a/2457053, should keep all lines
+        $().ready(function () {
+            setTimeout(function () {
+                if (jQuery.validator) {
+                    jQuery.extend(jQuery.validator.messages, {
+                        required: $("#requiredMessage").html(),
+                        remote: "Please fix this field.",
+                        email: $("#emailInvalidMessage").html(),
+                        url: $("#urlInvalidMessage").html(),
+                        date: "Please enter a valid date.",
+                        dateISO: "Please enter a valid date (ISO).",
+                        number: "Please enter a valid number.",
+                        digits: "Please enter only digits.",
+                        creditcard: "Please enter a valid credit card number.",
+                        equalTo: "Please enter the same value again.",
+                        accept: "Please enter a value with a valid extension.",
+                        maxlength: jQuery.validator.format("Please enter no more than {0} characters."),
+                        minlength: $("#minLengthMessage").html(),
+                        rangelength: jQuery.validator.format("Please enter a value between {0} and {1} characters long."),
+                        range: jQuery.validator.format("Please enter a value between {0} and {1}."),
+                        max: jQuery.validator.format("Please enter a value less than or equal to {0}."),
+                        min: jQuery.validator.format("Please enter a value greater than or equal to {0}.")
+                    });
+                }
+            }, 0);
+        });
+
+        function OnClickToSave(e, thisContainer, callbackDisableForm, postFunctionName, ajaxParams) {
+            var current = $(e.currentTarget);
+            if (!thisContainer.valid()) {
+                return;
+            }
+
+            callbackDisableForm(true);
+            var ajaxUrl = '/api/' + postFunctionName;
+            $.ajax({
+                type: 'POST',
+                contentType: "application/json",
+                url: ajaxUrl,
+                data: JSON.stringify(ajaxParams)
+            })
+                .done(function (data) {
+                    window.location.href = '/api/MarkupPage/Index';
+                })
+                .fail(function () {
+                    callbackDisableForm(false);
+                    alert("appDeveloper: Sorry, the app made a mistake.");
+                });
+        }
+    </script>
+</head>
+<body class="mb-5">
