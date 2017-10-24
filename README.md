@@ -1,5 +1,5 @@
 # Kynodontas
-Serverless Web Application Framework based on Azure Functions and Cosmos DB
+Serverless Web Application Framework for Azure Functions and Cosmos DB
 
 TODO:
 - Upload unit tests
