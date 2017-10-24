@@ -90,11 +90,11 @@ namespace Kynodontas.Basic
         public List<string> NonAuthPages = new List<string> { "SignIn", "Mistake", "CloseThisTab" };
         public string LocalHostPath = "http://localhost:7071";
         public string ApiPath = "/api/";
-        public string DatabaseId = "Database1";
+        public string DatabaseId = "KyndontasDatabase";
         public string DatabaseEndpoint = "https://localhost:8081/";
         public string DatabaseDocumentKey = "C2y*******";
         public string DomainPath = "https://example.azurewebsites.net";
         public string MailgunKey = "key-*********";
-        public string MailgunDomain = "sandboxbe********.mailgun.org";
+        public string MailgunDomain = "sandbox********.mailgun.org";
     }
 }
