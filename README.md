@@ -1,5 +1,5 @@
 # Kynodontas
-Serverless Web Application Framework for Azure Functions and Cosmos DB.
+Serverless Web Application Framework for Azure Functions and Cosmos DB. Also uses Mailgun.
 
 # Get Started
 - Install Visual Studio 2017 Community or superior.
