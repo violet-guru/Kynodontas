@@ -7,3 +7,6 @@ Serverless Web MVC Framework for Azure Functions and Cosmos DB. Also uses Mailgu
 - Install Azure Cosmos DB Emulator. Add a collection with 'KynodontasDatabase' database id and 'Record' collection id.
 - Open Kynodontas.Basic/Common.cs, edit the DB data and Mailgun data.
 - Run the project.
+
+# Contact
+hello@violet.guru
